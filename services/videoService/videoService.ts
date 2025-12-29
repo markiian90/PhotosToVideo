@@ -3,6 +3,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as MediaLibrary from "expo-media-library";
 import { VideoConfig, VideoProgress } from "./videoService.types";
 
+// Cancellation state for video rendering
 let isCancelled = false;
 let currentAbortController: AbortController | null = null;
 
@@ -75,6 +76,7 @@ export const createVideo = async (
       });
     });
 
+    // Clean up downloaded file if cancelled
     if (isCancelled) {
       try {
         await FileSystem.deleteAsync(videoPath, { idempotent: true });
@@ -195,13 +197,14 @@ const uploadAndCreateVideo = async (
       );
     }
 
+    // Prepare video configuration for server
     const resolution = config.resolution === "1080p" ? "1920:1080" : "1280:720";
     const fps = 1;
 
     formData.append("imageDuration", config.imageDuration.toString());
     formData.append("fps", fps.toString());
     formData.append("resolution", resolution);
-    formData.append("crf", "23");
+    formData.append("crf", "23"); // Video quality (lower = better quality, larger file)
     formData.append("transitionType", config.transitionType);
     formData.append("transitionDuration", config.transitionDuration.toString());
 
@@ -322,6 +325,7 @@ const uploadAndCreateVideo = async (
   }
 };
 
+// Download video from server to local cache
 const downloadVideo = async (
   videoUrl: string,
   onProgress: (progress: number) => void

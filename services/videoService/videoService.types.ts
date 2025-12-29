@@ -3,9 +3,9 @@ export type TransitionType = 'fade' | 'kenburns' | 'slide';
 
 export interface VideoConfig {
   resolution: Resolution;
-  imageDuration: number; // 2, 3, or 4 seconds
+  imageDuration: number; 
   transitionType: TransitionType;
-  transitionDuration: number; // default 0.5s
+  transitionDuration: number; 
 }
 
 export interface VideoProgress {

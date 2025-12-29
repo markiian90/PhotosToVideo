@@ -7,12 +7,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Modal,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+  Platform
 } from 'react-native';
+import videoPreviewStyles from './VideoPreviewModal.styles';
 
 interface VideoPreviewModalProps {
   visible: boolean;
@@ -31,14 +28,13 @@ export default function VideoPreviewModal({
   const [videoSource, setVideoSource] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Нормалізуємо URI для Android
+  // Normalize video URI for Android
   useEffect(() => {
     if (visible && videoUri) {
       const normalizeUri = async () => {
         try {
           let uri = videoUri;
           
-          // Якщо це файловий шлях без file:// префіксу, додаємо його
           if (uri.startsWith('/') && !uri.startsWith('file://')) {
             uri = `file://${uri}`;
           }
@@ -50,7 +46,7 @@ export default function VideoPreviewModal({
                 setError('Video file not found');
                 return;
               }
-              // Перевіряємо розмір файлу (відео не може бути менше 1KB)
+              // Check file size (video cannot be less than 1KB)
               if (fileInfo.size && fileInfo.size < 1024) {
                 console.warn('Video file seems too small:', fileInfo.size, 'bytes');
                 setError('Video file is corrupted or not fully downloaded');
@@ -241,29 +237,29 @@ export default function VideoPreviewModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
+      <videoPreviewStyles.ModalOverlay>
+        <videoPreviewStyles.ModalContent>
           {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Your video is ready! 🎉</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
-          </View>
+          <videoPreviewStyles.Header>
+            <videoPreviewStyles.Title>Your video is ready! 🎉</videoPreviewStyles.Title>
+            <videoPreviewStyles.CloseButton onPress={onClose}>
+              <videoPreviewStyles.CloseButtonText>✕</videoPreviewStyles.CloseButtonText>
+            </videoPreviewStyles.CloseButton>
+          </videoPreviewStyles.Header>
 
           {/* Video Player */}
-          <View style={styles.videoContainer}>
+          <videoPreviewStyles.VideoContainer>
             {error ? (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>⚠️ {error}</Text>
-                <Text style={styles.errorSubtext}>URI: {videoUri}</Text>
-              </View>
+              <videoPreviewStyles.ErrorContainer>
+                <videoPreviewStyles.ErrorText>⚠️ {error}</videoPreviewStyles.ErrorText>
+                <videoPreviewStyles.ErrorSubtext>URI: {videoUri}</videoPreviewStyles.ErrorSubtext>
+              </videoPreviewStyles.ErrorContainer>
             ) : videoSource ? (
               <>
                 <Video
                   ref={videoRef}
                   source={{ uri: videoSource }}
-                  style={styles.video}
+                  style={{ width: '100%', height: '100%' }}
                   resizeMode={ResizeMode.CONTAIN}
                   shouldPlay={false}
                   isLooping={false}
@@ -277,266 +273,69 @@ export default function VideoPreviewModal({
 
                 {/* Play/Pause Overlay */}
                 {!isPlaying && (
-                  <TouchableOpacity
-                    style={styles.playOverlay}
-                    onPress={handlePlayPause}
-                  >
-                    <View style={styles.playButton}>
-                      <Text style={styles.playButtonText}>▶</Text>
-                    </View>
-                  </TouchableOpacity>
+                  <videoPreviewStyles.PlayOverlay onPress={handlePlayPause}>
+                    <videoPreviewStyles.PlayButton>
+                      <videoPreviewStyles.PlayButtonText>▶</videoPreviewStyles.PlayButtonText>
+                    </videoPreviewStyles.PlayButton>
+                  </videoPreviewStyles.PlayOverlay>
                 )}
               </>
             ) : (
-              <View style={styles.loadingContainer}>
-                <Text style={styles.loadingText}>Downloading video...</Text>
-              </View>
+              <videoPreviewStyles.LoadingContainer>
+                <videoPreviewStyles.LoadingText>Downloading video...</videoPreviewStyles.LoadingText>
+              </videoPreviewStyles.LoadingContainer>
             )}
-          </View>
+          </videoPreviewStyles.VideoContainer>
 
           {/* Video Controls */}
-          <View style={styles.controls}>
+          <videoPreviewStyles.Controls>
             {/* Progress Bar */}
-            <View style={styles.progressContainer}>
-              <View style={styles.progressBar}>
-                <View
-                  style={[styles.progressFill, { width: `${progress * 100}%` }]}
-                />
-              </View>
-              <View style={styles.timeContainer}>
-                <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
-                <Text style={styles.timeText}>{formatTime(duration)}</Text>
-              </View>
-            </View>
+            <videoPreviewStyles.ProgressContainer>
+              <videoPreviewStyles.ProgressBar>
+                <videoPreviewStyles.ProgressFill $width={progress * 100} />
+              </videoPreviewStyles.ProgressBar>
+              <videoPreviewStyles.TimeContainer>
+                <videoPreviewStyles.TimeText>{formatTime(currentTime)}</videoPreviewStyles.TimeText>
+                <videoPreviewStyles.TimeText>{formatTime(duration)}</videoPreviewStyles.TimeText>
+              </videoPreviewStyles.TimeContainer>
+            </videoPreviewStyles.ProgressContainer>
 
             {/* Control Buttons */}
-            <View style={styles.controlButtons}>
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={handlePlayPause}
-              >
-                <Text style={styles.controlButtonText}>
+            <videoPreviewStyles.ControlButtons>
+              <videoPreviewStyles.ControlButton onPress={handlePlayPause}>
+                <videoPreviewStyles.ControlButtonText>
                   {isPlaying ? '⏸' : '▶'}
-                </Text>
-              </TouchableOpacity>
+                </videoPreviewStyles.ControlButtonText>
+              </videoPreviewStyles.ControlButton>
 
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={handleReplay}
-              >
-                <Text style={styles.controlButtonText}>↻</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+              <videoPreviewStyles.ControlButton onPress={handleReplay}>
+                <videoPreviewStyles.ControlButtonText>↻</videoPreviewStyles.ControlButtonText>
+              </videoPreviewStyles.ControlButton>
+            </videoPreviewStyles.ControlButtons>
+          </videoPreviewStyles.Controls>
 
           {/* Action Buttons */}
-          <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.saveButton]}
-              onPress={handleSaveToGallery}
-            >
-              <Text style={styles.actionButtonText}>💾 Save</Text>
-            </TouchableOpacity>
+          <videoPreviewStyles.ActionButtons>
+            <videoPreviewStyles.SaveButton onPress={handleSaveToGallery}>
+              <videoPreviewStyles.ActionButtonText>💾 Save</videoPreviewStyles.ActionButtonText>
+            </videoPreviewStyles.SaveButton>
 
-            <TouchableOpacity
-              style={[styles.actionButton, styles.shareButton]}
-              onPress={handleShare}
-            >
-              <Text style={styles.actionButtonText}>↗️ Share</Text>
-            </TouchableOpacity>
-          </View>
+            <videoPreviewStyles.ShareButton onPress={handleShare}>
+              <videoPreviewStyles.ActionButtonText>↗️ Share</videoPreviewStyles.ActionButtonText>
+            </videoPreviewStyles.ShareButton>
+          </videoPreviewStyles.ActionButtons>
 
           {/* Info */}
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoText}>
+          <videoPreviewStyles.InfoContainer>
+            <videoPreviewStyles.InfoText>
               ✓ Video saved to gallery
-            </Text>
-            <Text style={styles.infoSubtext}>
+            </videoPreviewStyles.InfoText>
+            <videoPreviewStyles.InfoSubtext>
               Format: MP4 • 16:9 • {status?.isLoaded && status.durationMillis ? Math.round(status.durationMillis / 1000) : 0}s
-            </Text>
-          </View>
-        </View>
-      </View>
+            </videoPreviewStyles.InfoSubtext>
+          </videoPreviewStyles.InfoContainer>
+        </videoPreviewStyles.ModalContent>
+      </videoPreviewStyles.ModalOverlay>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    overflow: 'hidden',
-    maxWidth: 600,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    fontSize: 20,
-    color: '#666',
-  },
-  videoContainer: {
-    aspectRatio: 16 / 9,
-    backgroundColor: '#000',
-    position: 'relative',
-  },
-  video: {
-    width: '100%',
-    height: '100%',
-  },
-  loadingContainer: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000',
-  },
-  loadingText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  errorContainer: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000',
-    padding: 20,
-  },
-  errorText: {
-    color: '#ff4444',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  errorSubtext: {
-    color: '#999',
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  playOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-  },
-  playButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  playButtonText: {
-    fontSize: 32,
-    color: '#2196F3',
-    marginLeft: 4,
-  },
-  controls: {
-    padding: 20,
-    backgroundColor: '#f9f9f9',
-  },
-  progressContainer: {
-    marginBottom: 12,
-  },
-  progressBar: {
-    height: 4,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 2,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#2196F3',
-  },
-  timeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  timeText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  controlButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  controlButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  controlButtonText: {
-    fontSize: 24,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    padding: 20,
-    gap: 12,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-  },
-  shareButton: {
-    backgroundColor: '#2196F3',
-  },
-  actionButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  infoContainer: {
-    padding: 20,
-    paddingTop: 0,
-    alignItems: 'center',
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#4CAF50',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  infoSubtext: {
-    fontSize: 12,
-    color: '#999',
-  },
-});

@@ -1,13 +1,13 @@
 # Image to Video Server
 
-Node.js сервер для конвертації зображень у відео за допомогою FFmpeg.
+Node.js server for converting images to video using FFmpeg.
 
-## 📋 Вимоги
+## 📋 Requirements
 
 - Node.js 18+ 
-- FFmpeg встановлений в системі
+- FFmpeg installed on the system
 
-### Встановлення FFmpeg
+### Installing FFmpeg
 
 **macOS:**
 ```bash
@@ -21,46 +21,46 @@ sudo apt-get install ffmpeg
 ```
 
 **Windows:**
-Завантажте з [ffmpeg.org](https://ffmpeg.org/download.html) або використовуйте:
+Download from [ffmpeg.org](https://ffmpeg.org/download.html) or use:
 ```bash
 choco install ffmpeg
 ```
 
-Перевірте встановлення:
+Verify installation:
 ```bash
 ffmpeg -version
 ```
 
-## 🚀 Встановлення та запуск
+## 🚀 Installation and Running
 
-1. Встановіть залежності:
+1. Install dependencies:
 ```bash
 cd server
 npm install
 ```
 
-2. Запустіть сервер:
+2. Start the server:
 ```bash
 npm start
 ```
 
-Сервер буде доступний на `http://localhost:3000`
+The server will be available at `http://localhost:3000`
 
 ## 📡 API Endpoints
 
 ### POST /create-video
 
-Створює відео з завантажених зображень.
+Creates a video from uploaded images.
 
 **Request:**
 - Method: `POST`
 - Content-Type: `multipart/form-data`
 - Body:
-  - `images`: масив файлів зображень (максимум 20)
-  - `imageDuration`: тривалість показу кожного зображення в секундах (опціонально, за замовчуванням 2)
-  - `fps`: FPS відео (опціонально, за замовчуванням 1)
-  - `resolution`: роздільна здатність у форматі `WIDTH:HEIGHT` (опціонально, за замовчуванням `1280:720`)
-  - `crf`: якість відео 18-28, менше = краще (опціонально, за замовчуванням 23)
+  - `images`: array of image files (maximum 20)
+  - `imageDuration`: duration to show each image in seconds (optional, default 2)
+  - `fps`: video FPS (optional, default 1)
+  - `resolution`: resolution in `WIDTH:HEIGHT` format (optional, default `1280:720`)
+  - `crf`: video quality 18-28, lower = better (optional, default 23)
 
 **Response:**
 ```json
@@ -71,26 +71,18 @@ npm start
 }
 ```
 
-## ⚙️ Налаштування
-
-Можна змінити порт через змінну середовища:
-```bash
-PORT=3001 npm start
-```
-
-## 📁 Структура
+## 📁 Structure
 
 ```
 server/
-├── uploads/     # Тимчасові зображення (автоматично видаляються)
-├── videos/      # Готові відео файли
-├── index.js     # Основний файл сервера
+├── uploads/     # Temporary images (automatically deleted)
+├── videos/      # Generated video files
+├── index.js     # Main server file
 └── package.json
 ```
 
-## 📝 Примітки
+## 📝 Notes
 
-- Сервер автоматично видаляє тимчасові файли після обробки
-- Відео файли зберігаються в директорії `videos/`
-- Для продакшену налаштуйте CORS та додайте аутентифікацію
-
+- Server automatically deletes temporary files after processing
+- Video files are stored in the `videos/` directory
+- For production, configure CORS and add authentication

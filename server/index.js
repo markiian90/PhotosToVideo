@@ -60,6 +60,7 @@ const upload = multer({
   }
 });
 
+// Build FFmpeg filter for simple concatenation without transitions
 function buildSimpleFilter(files, resolution, imageDuration, frameRate) {
   const filterParts = files.map((file, index) => {
     return `[${index}:v]loop=loop=-1:size=1:start=0,scale=${resolution}:force_original_aspect_ratio=decrease,pad=${resolution}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,trim=duration=${imageDuration},fps=${frameRate},setpts=PTS-STARTPTS[v${index}]`;
@@ -68,6 +69,7 @@ function buildSimpleFilter(files, resolution, imageDuration, frameRate) {
   return filterParts.join(';') + `;${concatInputs}concat=n=${files.length}:v=1:a=0[out]`;
 }
 
+// Build FFmpeg filter for fade transitions between images
 function buildFadeFilter(files, resolution, imageDuration, frameRate, transitionDuration) {
   const filterParts = files.map((file, index) => {
     const fadeIn = index === 0 ? '' : `,fade=t=in:st=0:d=${transitionDuration}`;
@@ -79,11 +81,12 @@ function buildFadeFilter(files, resolution, imageDuration, frameRate, transition
   return filterParts.join(';') + `;${concatInputs}concat=n=${files.length}:v=1:a=0[out]`;
 }
 
+// Build FFmpeg filter for Ken Burns effect (zoom + pan) with fade transitions
 function buildKenBurnsFilter(files, resolution, imageDuration, frameRate, transitionDuration, zoomIntensity = 'medium') {
   const totalFrames = Math.ceil(imageDuration * frameRate);
   const [width, height] = resolution.split(':').map(Number);
   
-  // Settings for zoom intensity
+  // Settings for zoom intensity levels
   const zoomSettings = {
     'subtle': { start: 1.0, end: 1.08 },  
     'light': { start: 1.0, end: 1.12 },   
@@ -125,6 +128,7 @@ function buildKenBurnsFilter(files, resolution, imageDuration, frameRate, transi
   return filterParts.join(';') + `;${concatInputs}concat=n=${files.length}:v=1:a=0[out]`;
 }
 
+// Build FFmpeg filter for slide transitions between images
 function buildSlideFilter(files, resolution, imageDuration, frameRate, transitionDuration, slideDirection = 'alternate') {
   const [width, height] = resolution.split(':').map(Number);
   
@@ -132,6 +136,7 @@ function buildSlideFilter(files, resolution, imageDuration, frameRate, transitio
     return `[0:v]loop=loop=-1:size=1:start=0,scale=${resolution}:force_original_aspect_ratio=decrease,pad=${resolution}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,trim=duration=${imageDuration},fps=${frameRate},setpts=PTS-STARTPTS[out]`;
   }
   
+  // Map slide directions to FFmpeg xfade transition types
   const directionMap = {
     'left': 'slideleft',
     'right': 'slideright',
@@ -172,15 +177,17 @@ function buildSlideFilter(files, resolution, imageDuration, frameRate, transitio
   return `${prepareFilters};${xfadeChain};[${currentLabel}]copy[out]`;
 }
 
+// Main endpoint: create video from uploaded images using FFmpeg
 app.post("/create-video", upload.array("images", 20), async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: "No images uploaded" });
   }
 
+  // Parse video configuration from request
   const imageDuration = parseFloat(req.body.imageDuration) || 3;
   const fps = parseFloat(req.body.fps) || 30;
   const resolution = req.body.resolution || "1280:720";
-  const crf = parseInt(req.body.crf) || 23;
+  const crf = parseInt(req.body.crf) || 23; // Constant Rate Factor for video quality
   const transitionType = req.body.transitionType || "fade";
   const transitionDuration = parseFloat(req.body.transitionDuration) || 0.5;
   const slideDirection = req.body.slideDirection || "alternate";
@@ -204,14 +211,17 @@ app.post("/create-video", upload.array("images", 20), async (req, res) => {
 
   const command = ffmpeg();
   
+  // Adjust frame rate based on transition type (Ken Burns needs higher FPS for smooth zoom)
   const frameRate = transitionType === 'kenburns' 
     ? Math.max(24, Math.min(30, Math.ceil(fps))) 
     : Math.max(1, Math.min(30, Math.ceil(fps)));
   
+  // Add all image files as inputs
   files.forEach((file) => {
     command.input(file);
   });
   
+  // Build FFmpeg filter complex based on transition type
   let filterComplex;
   
   try {

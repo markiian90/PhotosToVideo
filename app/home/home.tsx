@@ -1,7 +1,7 @@
-import VideoPreviewModal from "@/components/VideoPreviewModal";
-import VideoProgressModal from "@/components/VideoProgressModal";
+import VideoPreviewModal from "@/components/VideoPreview/VideoPreviewModal";
+import VideoProgressModal from "@/components/VideoProgress/VideoProgressModal";
 import Navigation from "@/components/navigation/navigation";
-import VideoConfigModal from "@/components/videoConfigModal";
+import VideoConfigModal from "@/components/videoConfig/videoConfigModal";
 import videoService from "@/services/videoService/videoService";
 import { VideoConfig, VideoProgress } from "@/services/videoService/videoService.types";
 import { useImageStore } from "@/store/image";
@@ -38,17 +38,7 @@ export default function HomeScreen() {
     setImageModalVisible(false);
     setSelectedImageForView(null);
   };
-
-  const pickImage = async () => {
-    try {
-      await selectNewImages();
-    } catch (error: any) {
-      console.error("Error picking images:", error);
-      const errorMessage = error?.message || "Unable to select images. Please try again.";
-      Alert.alert("Error", errorMessage);
-    }
-  };
-
+  
   const selectNewImages = async () => {
     try {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -99,6 +89,17 @@ export default function HomeScreen() {
     }
   };
 
+  const pickImage = async () => {
+    try {
+      await selectNewImages();
+    } catch (error: any) {
+      console.error("Error picking images:", error);
+      const errorMessage = error?.message || "Unable to select images. Please try again.";
+      Alert.alert("Error", errorMessage);
+    }
+  };
+
+  // Validate image count and open config modal
   const handleConvertPress = () => {
     if (addedImages.length < 3) {
       Alert.alert(
@@ -121,6 +122,7 @@ export default function HomeScreen() {
     setConfigModalVisible(true);
   };
 
+  // Start video creation process with selected config
   const handleConfigConfirm = async (config: VideoConfig) => {
     setConfigModalVisible(false);
     setProgressModalVisible(true);
@@ -154,6 +156,7 @@ export default function HomeScreen() {
       console.error("Error creating video:", error);
       setProgressModalVisible(false);
       
+      // Categorize and format error messages for user-friendly display
       setTimeout(() => {
         let errorMessage = "Unable to create video.";
         let errorTitle = "Error";

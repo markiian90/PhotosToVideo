@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.markiianivantsiv.ImagetoVideo"
+      "bundleIdentifier": "com.ImagetoVideo"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.markiianivantsiv.ImagetoVideo"
+      "package": "com.ImagetoVideo"
     },
     "web": {
       "output": "static",
