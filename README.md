@@ -1,39 +1,130 @@
-# Welcome to your Expo app 👋
+# Image to Video 🎬
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo додаток для конвертації зображень у відео за допомогою Node.js сервера та FFmpeg.
 
-## Get started
+## 🏗️ Архітектура
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+Expo App (Android/iOS)
+    ↓ (upload images)
+Node.js Server (Express)
+    ↓ (FFmpeg processing)
+MP4 Video
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🚀 Швидкий старт
+
+### 1. Встановлення залежностей
+
+```bash
+npm install
+```
+
+### 2. Налаштування сервера
+
+Перейдіть в директорію сервера та встановіть залежності:
+
+```bash
+cd server
+npm install
+```
+
+**Важливо:** Переконайтеся, що FFmpeg встановлений в системі:
+```bash
+ffmpeg -version
+```
+
+Якщо FFmpeg не встановлений:
+- **macOS:** `brew install ffmpeg`
+- **Linux:** `sudo apt-get install ffmpeg`
+- **Windows:** Завантажте з [ffmpeg.org](https://ffmpeg.org/download.html)
+
+### 3. Запуск сервера
+
+В окремому терміналі:
+
+```bash
+cd server
+npm start
+```
+
+Сервер буде доступний на `http://localhost:3000`
+
+### 4. Налаштування URL сервера в додатку
+
+#### Для емуляторів/симуляторів:
+Автоматично визначається:
+- **iOS Simulator:** `http://localhost:3000`
+- **Android Emulator:** `http://10.0.2.2:3000`
+
+#### Для реальних пристроїв (Expo Go):
+**Важливо:** На реальному пристрої `localhost` не працює! Потрібно використовувати IP адресу вашого комп'ютера.
+
+**Варіант 1: Через змінну середовища (рекомендовано)**
+
+Створіть файл `.env` в корені проекту:
+```bash
+EXPO_PUBLIC_SERVER_URL=http://YOUR_COMPUTER_IP:3000
+```
+
+Знайдіть IP адресу вашого комп'ютера:
+- **macOS/Linux:** `ifconfig | grep "inet "` або `ip addr show`
+- **Windows:** `ipconfig` (шукайте IPv4 адресу в локальній мережі)
+
+Приклад:
+```bash
+EXPO_PUBLIC_SERVER_URL=http://192.168.1.100:3000
+```
+
+**Варіант 2: Вручну в коді**
+
+Відредагуйте `constants/server.ts` та замініть `localhost` на IP адресу:
+```typescript
+return 'http://192.168.1.100:3000'; // Замініть на вашу IP
+```
+
+**Переконайтеся що:**
+- Комп'ютер і телефон в одній Wi-Fi мережі
+- Файрвол не блокує порт 3000
+- Сервер запущений на комп'ютері
+
+### 5. Запуск Expo додатку
+
+```bash
+npx expo start
+```
+
+## 📱 Використання
+
+1. Виберіть 3-5 зображень з галереї
+2. Налаштуйте параметри відео (роздільна здатність, тривалість, перехід)
+3. Створіть відео - зображення будуть завантажені на сервер, оброблені FFmpeg та повернуті як MP4
+4. Перегляньте та збережіть відео в галерею
+
+## 📁 Структура проекту
+
+```
+ImagetoVideo/
+├── app/              # Expo Router додаток
+├── components/       # React компоненти
+├── services/         # Бізнес-логіка (videoService.ts)
+├── constants/        # Конфігурація (server.ts)
+├── server/           # Node.js сервер
+│   ├── index.js     # Express сервер з FFmpeg
+│   ├── uploads/     # Тимчасові зображення
+│   └── videos/      # Готові відео
+└── package.json
+```
+
+## 🔧 Налаштування
+
+Детальні інструкції для сервера дивіться в [server/README.md](server/README.md)
+
+## 📝 Примітки
+
+- Сервер автоматично видаляє тимчасові файли після обробки
+- Відео зберігаються на сервері в `server/videos/`
+- Для продакшену налаштуйте CORS та додайте аутентифікацію
 
 ## Learn more
 

@@ -38,6 +38,9 @@ const NavigationStyles = {
   ButtonText: styled.Text`
     color: #00000090;
     font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    font-family: 'Poppins-Regular';
   `,
 };
 

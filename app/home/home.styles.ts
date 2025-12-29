@@ -33,7 +33,7 @@ const HomeStyles = {
     justify-content: center;
     align-items: center;
     margin-bottom: 15px;
-    margin-top: 55px;
+    margin-top: 15px;
   `,
   PlaceholderText: styled.Text`
     color: ${colors.placeholderText};
@@ -92,7 +92,7 @@ const HomeStyles = {
   ImagesContainer: styled.ScrollView`
     gap: 10px;
     margin-bottom: 15px;
-    margin-top: 55px;
+    margin-top: 15px;
   `,
   ButtonContainer: styled.View`
     gap: 15px;

@@ -11,12 +11,7 @@ export default function Navigation({ activeTab }: { activeTab: string }) {
       icon: "🏠",
       text: "Home",
       tab: "home",
-    },
-    {
-      icon: "🎥",
-      text: "Video",
-      tab: "video",
-    },
+    }
   ];
 
   return (

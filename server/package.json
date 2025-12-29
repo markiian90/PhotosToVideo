@@ -1,0 +1,21 @@
+{
+  "name": "image-to-video-server",
+  "version": "1.0.0",
+  "description": "Node.js server for converting images to video using FFmpeg",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": ["ffmpeg", "video", "images"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "cors": "^2.8.5"
+  }
+}
+
